@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="795.0" prefWidth="1178.0" style="-fx-background-color: #FFFACD;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.GenerateBillController">
+   <children>
+      <Button layoutX="42.0" layoutY="704.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="153.0" style="-fx-background-color: #B3FFCC;" text="Button">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Label layoutX="31.0" layoutY="47.0" prefHeight="25.0" prefWidth="117.0" text="Nombre del cliente:">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <TextField fx:id="clientName" layoutX="148.0" layoutY="37.0" prefHeight="45.0" prefWidth="184.0" promptText="Nombre del cliente" />
+      <ListView fx:id="clientList" layoutX="148.0" layoutY="82.0" prefHeight="72.0" prefWidth="184.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></ListView>
+      <Label layoutX="378.0" layoutY="47.0" prefHeight="25.0" prefWidth="138.0" text="Codigo del Vendedor:">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <TextField fx:id="codigoVendedorLabel" layoutX="516.0" layoutY="37.0" prefHeight="45.0" prefWidth="184.0" promptText="Codigo del vendedor">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></TextField>
+      <TableView fx:id="tableIBill" layoutX="42.0" layoutY="309.0" prefHeight="366.0" prefWidth="691.0">
+         <columns>
+            <TableColumn fx:id="id" prefWidth="64.0" text="Id" />
+            <TableColumn fx:id="Descripcion" prefWidth="347.0" text="Descripcion" />
+            <TableColumn fx:id="estado" prefWidth="89.0" text="Estado" />
+            <TableColumn fx:id="precio" prefWidth="64.0" text="Precio" />
+            <TableColumn fx:id="stock" prefWidth="55.0" text="Stock" />
+            <TableColumn fx:id="descuento" prefWidth="70.0" text="Descuento" />
+         </columns>
+      </TableView>
+      <TextField fx:id="searchFieldProduct" layoutX="172.0" layoutY="172.0" prefHeight="40.0" prefWidth="413.0" promptText="Agregar" style="-fx-background-color: #FFFFFF;">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </TextField>
+      <Label layoutX="32.0" layoutY="179.0" prefHeight="26.0" prefWidth="115.0" text="Agregar producto:">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <ListView id="listAddProduct" fx:id="productList" layoutX="172.0" layoutY="212.0" prefHeight="72.0" prefWidth="413.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </ListView>
+      <TextField id="cantidad" fx:id="cantidadProduct" layoutX="775.0" layoutY="171.0" prefHeight="45.0" prefWidth="184.0" promptText="Cantidad">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </TextField>
+      <Label layoutX="689.0" layoutY="180.0" prefHeight="26.0" prefWidth="115.0" text="Cantidad:">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Button fx:id="addProduct" layoutX="775.0" layoutY="254.0" mnemonicParsing="false" onAction="#addProductTable" prefHeight="37.0" prefWidth="153.0" style="-fx-background-color: #B3FFCC;" text="Agregar producto">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+   </children>
+</AnchorPane>

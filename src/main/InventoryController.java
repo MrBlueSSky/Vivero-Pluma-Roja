@@ -32,6 +32,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -105,40 +106,56 @@ public class InventoryController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         id.setCellValueFactory(new PropertyValueFactory<>("productoId"));
         Descripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
         estado.setCellValueFactory(new PropertyValueFactory<>("estado"));
         precio.setCellValueFactory(new PropertyValueFactory<>("precio"));
         stock.setCellValueFactory(new PropertyValueFactory<>("stock"));
-        descuento.setCellValueFactory(new PropertyValueFactory<>("descuentoId"));
+        descuento.setCellValueFactory(new PropertyValueFactory<>("descuentoId")); // Mantener ID de descuento
 
         // Cargar los datos desde la base de datos
         productosList = FXCollections.observableArrayList();
         cargarDatosDesdeDB();
         tableInventory.setItems(productosList);
-        
-    
-    // Configurar la columna de precio con formato
-    precio.setCellValueFactory(new PropertyValueFactory<>("precio"));
-    precio.setCellFactory(column -> new TableCell<Producto, Double>() {
-        
-       
-        protected void updateItem(Double item, boolean empty) {
-            super.updateItem(item, empty);
-            if (empty || item == null) {
-                setText(null);
-            } else {
-                setText(String.format("%.2f", item));
+
+        // Configurar la columna de precio con formato
+        precio.setCellValueFactory(new PropertyValueFactory<>("precio"));
+        precio.setCellFactory(column -> new TableCell<Producto, Double>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%.2f", item));
+                }
             }
-        }
-    });
+        });
+
+        // Configurar la columna de descuento para mostrar el porcentaje
+        descuento.setCellFactory(column -> new TableCell<Producto, Integer>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    // Obtener el porcentaje de descuento de la lista
+                    Producto producto = getTableView().getItems().get(getIndex());
+                    if (producto.getDescuentoId() > 0) {
+                        // Lógica para obtener el porcentaje según el ID (esto puede requerir otro método o lógica)
+                        setText(item + "%");  // Mostrar el porcentaje de descuento
+                    } else {
+                        setText("Sin descuento");
+                    }
+                }
+            }
+        });
 
         // Añadir el listener al TextField para la búsqueda en tiempo real
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             filtrarProductos(newValue);
         });
-
     }
 
     /**
@@ -172,16 +189,16 @@ public class InventoryController implements Initializable {
                 String estado = rs.getString("estado");
                 double precio = rs.getDouble("precio");
                 int stock = rs.getInt("stock");
-                double descuentoPorcentaje = rs.getDouble("descuentoPorcentaje");  // Leer porcentaje del descuento
-                int categoriaId = rs.getInt("categoriaId");
+                int descuentoId = rs.getInt("descuentoId");
+                int descuentoPorcentaje = rs.getInt("descuentoPorcentaje"); // Obtener el porcentaje de descuento
 
                 // Validar los datos recuperados
                 if (descripcion != null && !descripcion.trim().isEmpty()
                         && estado != null && !estado.trim().isEmpty()
                         && precio >= 0 && stock >= 0) {
 
-                    // Agregar a la lista observable
-                    productosList.add(new Producto(productoId, descripcion, estado, precio, stock, descuentoPorcentaje));
+                    // Agregar a la lista observable, pero usaremos solo descuentoId
+                    productosList.add(new Producto(productoId, descripcion, estado, precio, stock, descuentoId));
                 } else {
                     System.err.println("Error: Datos inválidos para el producto ID: " + productoId);
                 }
@@ -289,7 +306,6 @@ public class InventoryController implements Initializable {
             mainStage.show();
 
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -304,7 +320,7 @@ public class InventoryController implements Initializable {
 
             // Obtener la ventana actual
             Stage stage = (Stage) tableInventory.getScene().getWindow();
-            stage.close();  // Cerrar la ventana de login
+            stage.close();  // Cerrar la ventana de inventario
 
             // Crear una nueva ventana para la próxima vista
             Stage mainStage = new Stage();
@@ -313,7 +329,6 @@ public class InventoryController implements Initializable {
             mainStage.show();
 
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

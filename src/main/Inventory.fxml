@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="662.0" prefWidth="1079.0" style="-fx-background-color: #FFFACD;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.InventoryController">
+   <children>
+      <TableView fx:id="tableInventory" layoutX="23.0" layoutY="126.0" prefHeight="366.0" prefWidth="691.0">
+        <columns>
+          <TableColumn fx:id="id" prefWidth="64.0" text="Id" />
+          <TableColumn fx:id="Descripcion" prefWidth="347.0" text="Descripcion" />
+            <TableColumn fx:id="estado" prefWidth="89.0" text="Estado" />
+            <TableColumn fx:id="precio" prefWidth="64.0" text="Precio" />
+            <TableColumn fx:id="stock" prefWidth="55.0" text="Stock" />
+            <TableColumn fx:id="descuento" prefWidth="70.0" text="Descuento" />
+        </columns>
+      </TableView>
+      <Button fx:id="nuevoProdcto" layoutX="23.0" layoutY="553.0" mnemonicParsing="false" onAction="#newProduct" prefHeight="48.0" prefWidth="246.0" style="-fx-background-color: #B3FFCC;" text="Agregar un nuevo producto">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="facturas" layoutX="588.0" layoutY="553.0" mnemonicParsing="false" onAction="#billMethod" prefHeight="48.0" prefWidth="211.0" style="-fx-background-color: #B3FFCC;" text="Facturas">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <TextField fx:id="searchField" layoutX="186.0" layoutY="48.0" prefHeight="40.0" prefWidth="413.0" promptText="Buscar" style="-fx-background-color: #FFFFFF;" />
+      <Button fx:id="updateProduct" layoutX="307.0" layoutY="553.0" mnemonicParsing="false" onAction="#updateProduct" prefHeight="48.0" prefWidth="246.0" style="-fx-background-color: #B3FFCC;" text="Actualizar producto">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="delete" layoutX="833.0" layoutY="553.0" mnemonicParsing="false" onAction="#deleteProduct" prefHeight="48.0" prefWidth="211.0" style="-fx-background-color: #B3FFCC;" text="Eliminar">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="newClient" layoutX="789.0" layoutY="307.0" mnemonicParsing="false" onAction="#newClient" prefHeight="48.0" prefWidth="211.0" style="-fx-background-color: #B3FFCC;" text="Agregar nuevo cliente">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="newSeller" layoutX="789.0" layoutY="198.0" mnemonicParsing="false" onAction="#newSeller" prefHeight="48.0" prefWidth="211.0" style="-fx-background-color: #B3FFCC;" text="Agregar nuevo vendedor">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="buttonReport" layoutX="784.0" layoutY="413.0" mnemonicParsing="false" onAction="#generateReport" prefHeight="48.0" prefWidth="222.0" style="-fx-background-color: #B3FFCC;" text="Crear reporte de inventario">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <Label layoutX="61.0" layoutY="55.0" prefHeight="26.0" prefWidth="115.0" text="Buscar:">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label fx:id="nombreVendedorLabel" alignment="CENTER_RIGHT" layoutX="883.0" layoutY="6.0" prefHeight="32.0" prefWidth="190.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font></Label>
+   </children>
+</AnchorPane>
