@@ -5,16 +5,24 @@
 package main;
 
 import Clases.DBconection;
+import Clases.Factura;
 import Clases.Producto;
+import java.awt.Color;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -39,6 +47,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 /**
  * FXML Controller class responsible for generating bills. This class handles
@@ -114,7 +127,7 @@ public class GenerateBillController implements Initializable {
         id.setCellValueFactory(new PropertyValueFactory<>("productoId"));
         Descripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
         estado.setCellValueFactory(new PropertyValueFactory<>("estado"));
-        stock.setCellValueFactory(new PropertyValueFactory<>("stock"));  
+        stock.setCellValueFactory(new PropertyValueFactory<>("stock"));
         descuento.setCellValueFactory(new PropertyValueFactory<>("descuentoId"));
         precio.setCellValueFactory(new PropertyValueFactory<>("precio"));
 
@@ -171,7 +184,7 @@ public class GenerateBillController implements Initializable {
         estado.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEstado()));
 
         precio.setCellFactory(tc -> new javafx.scene.control.TableCell<Producto, Double>() {
-            
+
             @Override
             protected void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
@@ -203,6 +216,7 @@ public class GenerateBillController implements Initializable {
         // Cargar datos adicionales desde la base de datos (monedas y estados).
         cargarEstadosDesdeBaseDeDatos();
         cargarMonedasDesdeBaseDeDatos();
+        updateInvoiceTotals();
     }
 
     /**
@@ -484,7 +498,7 @@ public class GenerateBillController implements Initializable {
 
             // Show the previous view
             Stage mainStage = new Stage();
-            mainStage.setTitle("Main Menu");
+            mainStage.setTitle("Bill Menu");
             mainStage.setScene(new Scene(root));
             mainStage.show();
         } catch (IOException e) {
@@ -632,8 +646,28 @@ public class GenerateBillController implements Initializable {
         }
     }
 
+    /**
+     * Handles the billing process by validating the required fields and
+     * inserting the corresponding records in the database tables. It also
+     * deducts stock quantities for each product included in the invoice.
+     *
+     * @param event The action event triggered by the "bill" button.
+     */
     @FXML
     private void bill(ActionEvent event) {
+
+    }
+
+    /**
+     * Handles the billing process without affecting the product stock. This
+     * method validates the required fields and inserts the corresponding
+     * records in the database tables but skips the stock update step.
+     *
+     * @param event The action event triggered by the "billWithout" button.
+     */
+    @FXML
+    private void billWithout(ActionEvent event) {
+
     }
 
     /**
@@ -652,14 +686,19 @@ public class GenerateBillController implements Initializable {
         alert.showAndWait();
     }
 
-    @FXML
-    private void billWithout(ActionEvent event) {
-    }
-
-    @FXML
-    private void updateTotalAmount() {
-        double finalTotal = calculateFinalTotal(); // Calcula el total final
-        total.setText(String.format("%.2f", finalTotal)); // Actualiza el campo
+    /**
+     * Formats the given amount to display correctly in the TextField. If the
+     * amount has no significant decimal places, shows it without trailing
+     * zeros.
+     */
+    private String formatAmount(double amount) {
+        if (amount == (long) amount) {
+            // Si el valor no tiene parte decimal significativa, muestra como número entero
+            return String.format("%d", (long) amount);
+        } else {
+            // Si tiene parte decimal significativa, muestra con un solo decimal o con dos si es necesario
+            return String.format("%.2f", amount).replaceAll("0*$", ""); // Elimina ceros al final
+        }
     }
 
     /**
@@ -668,7 +707,7 @@ public class GenerateBillController implements Initializable {
     @FXML
     private void updateSubTotalAmount() {
         double subTotalAmount = calculateSubTotal(); // Calcula el subtotal
-        subTotal.setText(String.format("%.2f", subTotalAmount)); // Actualiza el campo
+        subTotal.setText(formatAmount(subTotalAmount)); // Actualiza con formato corregido
     }
 
     /**
@@ -676,8 +715,17 @@ public class GenerateBillController implements Initializable {
      */
     @FXML
     private void updateDiscountAmount() {
-        double discountAmount = calculateDiscount(); // Calcula el descuento
-        discount.setText(String.format("%.2f", discountAmount)); // Actualiza el campo
+        double discountAmount = calculateDiscount(); // Calcula el descuento total
+        discount.setText(formatAmount(discountAmount)); // Actualiza con formato corregido
+    }
+
+    /**
+     * Updates the total amount displayed in the total TextField.
+     */
+    @FXML
+    private void updateTotalAmount() {
+        double finalTotal = calculateFinalTotal(); // Calcula el total final
+        total.setText(formatAmount(finalTotal)); // Actualiza con formato corregido
     }
 
     /**
@@ -687,23 +735,26 @@ public class GenerateBillController implements Initializable {
     private double calculateSubTotal() {
         double subTotalAmount = 0.0;
         for (Producto product : tableIBill.getItems()) {
-            subTotalAmount += product.getPrecio() * product.getStock(); // Calcula el subtotal
+            subTotalAmount += product.getPrecio() * product.getStock(); // Subtotal por cada producto: precio * cantidad
         }
         return subTotalAmount; // Devuelve el subtotal
     }
 
     /**
-     * Calculates the total discount based on the products in the table.
+     * Calculates the total discount based on the discount field in the
+     * products.
      */
     private double calculateDiscount() {
         double totalDiscount = 0.0;
         for (Producto product : tableIBill.getItems()) {
-            int discountPercentage = obtenerPorcentajeDescuento(product.getDescuentoId()); // Obtiene el porcentaje de descuento
-            double discountDecimal = discountPercentage / 100.0; // Convierte a decimal
-            double discountAmount = product.getPrecio() * discountDecimal * product.getStock(); // Calcula el descuento
-            totalDiscount += discountAmount; // Acumula el descuento total
+            double discountPercentage = product.getDescuentoId(); // Obtiene el valor de descuento del producto (puede ser 0)
+            if (discountPercentage > 0) { // Solo calcula el descuento si el porcentaje es mayor que 0
+                double discountDecimal = discountPercentage / 100.0; // Convierte a decimal (40 -> 0.40)
+                double discountAmount = product.getPrecio() * discountDecimal * product.getStock(); // Precio * porcentaje * cantidad
+                totalDiscount += discountAmount; // Acumula el descuento total
+            }
         }
-        return totalDiscount; // Devuelve el descuento total
+        return totalDiscount; // Devuelve el total de descuento
     }
 
     /**
@@ -716,31 +767,12 @@ public class GenerateBillController implements Initializable {
     }
 
     /**
-     * Obtains the discount percentage based on the provided discountId.
-     */
-    private int obtenerPorcentajeDescuento(int descuentoId) {
-        int porcentaje = 0;
-        String query = "SELECT porcentaje FROM Descuentos WHERE id = ?";
-        try (Connection connection = new DBconection().establishConnection(); // Establece la conexión
-                 PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, descuentoId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                porcentaje = resultSet.getInt("porcentaje"); // Obtiene el porcentaje del resultado
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); // Manejo de excepciones
-        }
-        return porcentaje; // Devuelve el porcentaje
-    }
-
-    /**
      * Updates the totals displayed in the invoice.
      */
     private void updateInvoiceTotals() {
-        updateSubTotalAmount(); // Actualiza subtotal
-        updateDiscountAmount(); // Actualiza descuento
-        updateTotalAmount(); // Actualiza total
+        updateSubTotalAmount(); // Actualiza el subtotal
+        updateDiscountAmount(); // Actualiza el descuento
+        updateTotalAmount(); // Actualiza el total
     }
 
     /**
@@ -778,6 +810,252 @@ public class GenerateBillController implements Initializable {
             alert.setHeaderText("No hay producto seleccionado");
             alert.setContentText("Seleccione un producto para eliminar.");
             alert.showAndWait();
+        }
+    }
+
+    /**
+     * Generates a PDF report for the sale details. This method retrieves sale
+     * data from the database, formats it into a PDF file, and attempts to open
+     * the file in the system's default PDF viewer.
+     *
+     * @param event the event triggered by the button click to generate the
+     * report.
+     */
+    @FXML
+    private void generateSaleReport(ActionEvent event) throws SQLException, IOException {
+        Connection conn = null;
+        PDDocument document = null;
+        PDPageContentStream contentStream = null;
+
+        try {
+            // Establish connection using your custom DB connection class
+            conn = new DBconection().establishConnection();
+
+            // Create a new document
+            document = new PDDocument();
+            PDPage page = new PDPage();
+            document.addPage(page);
+
+            // Create content stream to write to the PDF
+            contentStream = new PDPageContentStream(document, page);
+
+            // Add logo
+            File logoFile = new File("C:\\Users\\fabri\\Documents\\NetBeansProjects\\Vivero\\src\\Image\\logo.jpeg");
+            if (!logoFile.exists()) {
+                throw new FileNotFoundException("Logo file not found at: " + logoFile.getPath());
+            }
+            PDImageXObject logo = PDImageXObject.createFromFile(logoFile.getPath(), document);
+            float logoWidth = 200;
+            float logoHeight = 150;
+            contentStream.drawImage(logo, 25, page.getMediaBox().getHeight() - logoHeight - 25, logoWidth, logoHeight);
+
+            // Add date and time in the top-right corner
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA, 10);
+            float margin = 25;
+            float pageWidth = page.getMediaBox().getWidth();
+            float pageHeight = page.getMediaBox().getHeight();
+            contentStream.newLineAtOffset(pageWidth - margin - 200, pageHeight - margin);
+            contentStream.showText("Fecha de Generación: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            contentStream.endText();
+
+            // Add Vivero name below the date
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            contentStream.newLineAtOffset(pageWidth - margin - 200, pageHeight - margin - 20);
+            contentStream.showText("Vivero Pluma Roja");
+            contentStream.endText();
+
+            // Add phone and address
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA, 12);
+            contentStream.newLineAtOffset(logoWidth + 70, page.getMediaBox().getHeight() - 100);
+            contentStream.showText("Teléfono: +506 85651597");
+            contentStream.newLineAtOffset(0, -15);
+            contentStream.showText("Dirección: 300 metros sur de escuela Darizara,");
+            contentStream.newLineAtOffset(0, -15);
+            contentStream.showText("Barrio: Plaza Canoas, Canoas, Cantón Corredores,");
+            contentStream.newLineAtOffset(0, -15);
+            contentStream.showText("Provincia Puntarenas, 61003, Costa Rica.");
+            contentStream.endText();
+
+            // Add title
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 14);
+            contentStream.newLineAtOffset(margin, pageHeight - logoHeight - 100);
+            contentStream.showText("Reporte de Detalle de Ventas");
+            contentStream.endText();
+
+            // Add customer and seller names
+            String customerName = "Nombre del Cliente"; // Replace with actual data from your database
+            String sellerName = "Nombre del Vendedor"; // Replace with actual data from your database
+
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA, 12);
+            contentStream.newLineAtOffset(margin, pageHeight - logoHeight - 120); // Position below title
+            contentStream.showText("Cliente: " + customerName);
+            contentStream.newLineAtOffset(0, -15);
+            contentStream.showText("Vendedor: " + sellerName);
+            contentStream.endText();
+
+            // Define column widths and positions
+            int saleIdWidth = 80;
+            int productIdWidth = 80;
+            int descriptionWidth = 200;
+            int quantityWidth = 60;
+            int priceWidth = 60;
+            int totalWidth = 60;
+            int lineHeight = 12;
+
+            int xSaleId = 25;
+            int xProductId = xSaleId + saleIdWidth;
+            int xDescription = xProductId + productIdWidth;
+            int xQuantity = xDescription + descriptionWidth;
+            int xPrice = xQuantity + quantityWidth;
+            int xTotal = xPrice + priceWidth;
+
+            int headerHeight = 20; // Height for header row
+            int yPosition = (int) (pageHeight - logoHeight - 140 - headerHeight); // Initial y-position for data
+
+            // Add table headers
+            contentStream.setLineWidth(1f);
+            contentStream.setStrokingColor(Color.BLACK);
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 10);
+            contentStream.newLineAtOffset(xSaleId, yPosition + headerHeight);
+            contentStream.showText("Sale ID");
+            contentStream.newLineAtOffset(xProductId - xSaleId, 0);
+            contentStream.showText("Product ID");
+            contentStream.newLineAtOffset(xDescription - xProductId, 0);
+            contentStream.showText("Description");
+            contentStream.newLineAtOffset(xQuantity - xDescription, 0);
+            contentStream.showText("Quantity");
+            contentStream.newLineAtOffset(xPrice - xQuantity, 0);
+            contentStream.showText("Price");
+            contentStream.newLineAtOffset(xTotal - xPrice, 0);
+            contentStream.showText("Total");
+            contentStream.endText();
+
+            // Draw horizontal line under the headers
+            contentStream.moveTo(xSaleId, yPosition + headerHeight - 2);
+            contentStream.lineTo(xTotal + totalWidth, yPosition + headerHeight - 2);
+            contentStream.stroke();
+
+            // Draw vertical lines
+            contentStream.moveTo(xSaleId, yPosition + headerHeight);
+            contentStream.lineTo(xSaleId, yPosition - (lineHeight * 40));
+            contentStream.stroke();
+
+            contentStream.moveTo(xProductId, yPosition + headerHeight);
+            contentStream.lineTo(xProductId, yPosition - (lineHeight * 40));
+            contentStream.stroke();
+
+            contentStream.moveTo(xDescription, yPosition + headerHeight);
+            contentStream.lineTo(xDescription, yPosition - (lineHeight * 40));
+            contentStream.stroke();
+
+            contentStream.moveTo(xQuantity, yPosition + headerHeight);
+            contentStream.lineTo(xQuantity, yPosition - (lineHeight * 40));
+            contentStream.stroke();
+
+            contentStream.moveTo(xPrice, yPosition + headerHeight);
+            contentStream.lineTo(xPrice, yPosition - (lineHeight * 40));
+            contentStream.stroke();
+
+            contentStream.moveTo(xTotal, yPosition + headerHeight);
+            contentStream.lineTo(xTotal, yPosition - (lineHeight * 40));
+            contentStream.stroke();
+
+            // Draw bottom border of the table
+            contentStream.moveTo(xSaleId, yPosition - (lineHeight * 40) - 2);
+            contentStream.lineTo(xTotal + totalWidth, yPosition - (lineHeight * 40) - 2);
+            contentStream.stroke();
+
+            // Draw right border of the table
+            contentStream.moveTo(xTotal + totalWidth, yPosition + headerHeight);
+            contentStream.lineTo(xTotal + totalWidth, yPosition - (lineHeight * 40));
+            contentStream.stroke();
+
+            // Retrieve sale data from the database
+            String query = "SELECT saleId, productId, description, quantity, price, total, customerName, sellerName FROM SalesDetails"; // Adjust the query as necessary
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+
+            // Write table rows
+            while (rs.next()) {
+                // Check if the line fits within the page, otherwise create a new page
+                if (yPosition - lineHeight < 50) {
+                    contentStream.endText();
+                    contentStream.close();
+
+                    // Add a new page if needed
+                    PDPage newPage = new PDPage();
+                    document.addPage(newPage);
+                    contentStream = new PDPageContentStream(document, newPage);
+
+                    // Add header to the new page
+                    contentStream.beginText();
+                    contentStream.setFont(PDType1Font.HELVETICA_BOLD, 14);
+                    contentStream.newLineAtOffset(margin, newPage.getMediaBox().getHeight() - logoHeight - 100);
+                    contentStream.showText("Reporte de Detalle de Ventas");
+                    contentStream.endText();
+
+                    // Reset yPosition for the new page
+                    yPosition = (int) (newPage.getMediaBox().getHeight() - logoHeight - 140 - headerHeight);
+                }
+
+                // Write each row of sale details
+                contentStream.beginText();
+                contentStream.setFont(PDType1Font.HELVETICA, 10);
+                contentStream.newLineAtOffset(xSaleId, yPosition);
+                contentStream.showText(rs.getString("saleId"));
+                contentStream.newLineAtOffset(xProductId - xSaleId, 0);
+                contentStream.showText(rs.getString("productId"));
+                contentStream.newLineAtOffset(xDescription - xProductId, 0);
+                contentStream.showText(rs.getString("description"));
+                contentStream.newLineAtOffset(xQuantity - xDescription, 0);
+                contentStream.showText(rs.getString("quantity"));
+                contentStream.newLineAtOffset(xPrice - xQuantity, 0);
+                contentStream.showText(rs.getString("price"));
+                contentStream.newLineAtOffset(xTotal - xPrice, 0);
+                contentStream.showText(rs.getString("total"));
+                contentStream.endText();
+
+                // Move to the next row
+                yPosition -= lineHeight;
+            }
+
+            // Finalize the PDF
+            contentStream.close();
+            document.save("C:\\Users\\fabri\\Downloads\\detalle_venta.pdf");
+            document.close();
+
+            // Open the PDF
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(new File("C:\\Users\\fabri\\Downloads\\detalle_venta.pdf"));
+            }
+
+            // Inform the user
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Report Generated");
+            alert.setHeaderText(null);
+            alert.setContentText("The sale report has been generated successfully.");
+            alert.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("An error occurred while generating the report.");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
+            if (document != null) {
+                document.close();
+            }
         }
     }
 
