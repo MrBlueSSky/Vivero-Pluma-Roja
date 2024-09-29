@@ -10,11 +10,9 @@ import java.awt.Color;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,7 +30,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -42,7 +39,6 @@ import javafx.stage.Stage;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
@@ -111,7 +107,7 @@ public class InventoryController implements Initializable {
         estado.setCellValueFactory(new PropertyValueFactory<>("estado"));
         precio.setCellValueFactory(new PropertyValueFactory<>("precio"));
         stock.setCellValueFactory(new PropertyValueFactory<>("stock"));
-        descuento.setCellValueFactory(new PropertyValueFactory<>("descuentoId")); // Mantener ID de descuento
+        descuento.setCellValueFactory(new PropertyValueFactory<>("descuentoId"));
 
         // Cargar los datos desde la base de datos
         productosList = FXCollections.observableArrayList();

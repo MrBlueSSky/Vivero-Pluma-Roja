@@ -2,6 +2,7 @@
 
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TableColumn?>
@@ -10,9 +11,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="795.0" prefWidth="1178.0" style="-fx-background-color: #FFFACD;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.GenerateBillController">
+<AnchorPane id="AnchorPane" prefHeight="802.0" prefWidth="1178.0" style="-fx-background-color: #FFFACD;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.GenerateBillController">
    <children>
-      <Button layoutX="42.0" layoutY="704.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="153.0" style="-fx-background-color: #B3FFCC;" text="Button">
+      <Button fx:id="cancel" layoutX="42.0" layoutY="713.0" mnemonicParsing="false" onAction="#cancel" prefHeight="37.0" prefWidth="153.0" style="-fx-background-color: #B3FFCC;" text="Cancelar">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -45,7 +46,7 @@
             <TableColumn fx:id="Descripcion" prefWidth="347.0" text="Descripcion" />
             <TableColumn fx:id="estado" prefWidth="89.0" text="Estado" />
             <TableColumn fx:id="precio" prefWidth="64.0" text="Precio" />
-            <TableColumn fx:id="stock" prefWidth="55.0" text="Stock" />
+            <TableColumn fx:id="stock" prefWidth="55.0" text="Cantidad" />
             <TableColumn fx:id="descuento" prefWidth="70.0" text="Descuento" />
          </columns>
       </TableView>
@@ -64,17 +65,92 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ListView>
-      <TextField id="cantidad" fx:id="cantidadProduct" layoutX="775.0" layoutY="171.0" prefHeight="45.0" prefWidth="184.0" promptText="Cantidad">
+      <TextField id="cantidad" fx:id="cantidadProduct" layoutX="862.0" layoutY="193.0" prefHeight="45.0" prefWidth="184.0" promptText="Cantidad">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </TextField>
-      <Label layoutX="689.0" layoutY="180.0" prefHeight="26.0" prefWidth="115.0" text="Cantidad:">
+      <Label layoutX="759.0" layoutY="203.0" prefHeight="26.0" prefWidth="115.0" text="Cantidad:">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <Button fx:id="addProduct" layoutX="775.0" layoutY="254.0" mnemonicParsing="false" onAction="#addProductTable" prefHeight="37.0" prefWidth="153.0" style="-fx-background-color: #B3FFCC;" text="Agregar producto">
+      <Button fx:id="addProduct" layoutX="883.0" layoutY="266.0" mnemonicParsing="false" onAction="#addProductTable" prefHeight="37.0" prefWidth="153.0" style="-fx-background-color: #B3FFCC;" text="Agregar producto">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="billButton" layoutX="683.0" layoutY="713.0" mnemonicParsing="false" onAction="#bill" prefHeight="37.0" prefWidth="153.0" style="-fx-background-color: #B3FFCC;" text="Facturar">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="billWithoutButton" layoutX="463.0" layoutY="713.0" mnemonicParsing="false" onAction="#billWithout" prefHeight="37.0" prefWidth="153.0" style="-fx-background-color: #B3FFCC;" text="Facturar sin">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Label layoutX="747.0" layoutY="47.0" prefHeight="25.0" prefWidth="138.0" text="Estado de la factura :">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="state" layoutX="892.0" layoutY="47.0" prefWidth="150.0" promptText="Estado " />
+      <Label layoutX="769.0" layoutY="607.0" prefHeight="25.0" prefWidth="138.0" text="Total a pagar:">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <TextField fx:id="total" editable="false" layoutX="875.0" layoutY="597.0" onAction="#updateTotalAmount" prefHeight="45.0" prefWidth="184.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </TextField>
+      <Label layoutX="769.0" layoutY="534.0" prefHeight="25.0" prefWidth="138.0" text="Sub total:">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <TextField fx:id="subTotal" editable="false" layoutX="875.0" layoutY="524.0" onAction="#updateSubTotalAmount" prefHeight="45.0" prefWidth="184.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </TextField>
+      <Label layoutX="769.0" layoutY="455.0" prefHeight="25.0" prefWidth="138.0" text="Descuento:">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <TextField fx:id="discount" editable="false" layoutX="875.0" layoutY="445.0" onAction="#updateDiscountAmount" prefHeight="45.0" prefWidth="184.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </TextField>
+      <Label layoutX="747.0" layoutY="105.0" prefHeight="26.0" prefWidth="115.0" text="Moneda:">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="currency" layoutX="892.0" layoutY="106.0" prefWidth="150.0" promptText="Moneda" />
+      <Button fx:id="delete" layoutX="249.0" layoutY="713.0" mnemonicParsing="false" onAction="#delete" prefHeight="37.0" prefWidth="153.0" style="-fx-background-color: #B3FFCC;" text="Eliminar">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>

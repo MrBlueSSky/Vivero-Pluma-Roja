@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  *
  * @author Fabricio CUM
  */
-public class DBconection {
+public class DBconection  implements AutoCloseable{
 
     private Connection conection;
     private static final String USERNAME = "root";
@@ -58,6 +58,17 @@ public class DBconection {
             showAlert(AlertType.ERROR, "Error de Conexión", "Error inesperado: " + ex.getMessage());
         }
         return conection;
+    }
+    
+        @Override
+    public void close() {
+        try {
+            if (conection != null && !conection.isClosed()) {
+                conection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

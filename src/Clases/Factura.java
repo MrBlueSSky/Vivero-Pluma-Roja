@@ -23,6 +23,7 @@ public class Factura {
     private int monedaId;
     private String moneda;
     private String nombreCliente;
+    private int detalleVentasId;
 
     /**
      * Constructs a new Factura with the specified parameters.
@@ -34,8 +35,9 @@ public class Factura {
      * @param monedaId The ID of the currency used in the invoice.
      * @param moneda The name of the currency used in the invoice.
      * @param nombreCliente The name of the client.
+     * @param detalleVentasId Id of the detalleVenta.
      */
-    public Factura(int facturaId, int ventasId, Date fechaFactura, String estado, int monedaId, String moneda, String nombreCliente) {
+    public Factura(int facturaId, int ventasId, Date fechaFactura, String estado, int monedaId, String moneda, String nombreCliente, int detalleVentasId) {
         this.facturaId = facturaId;
         this.ventasId = ventasId;
         this.fechaFactura = fechaFactura;
@@ -43,6 +45,15 @@ public class Factura {
         this.monedaId = monedaId;
         this.moneda = moneda;
         this.nombreCliente = nombreCliente;
+        this.detalleVentasId = detalleVentasId;
+    }
+
+    public int getDetalleVentasId() {
+        return detalleVentasId;
+    }
+
+    public void setDetalleVentasId(int detalleVentasId) {
+        this.detalleVentasId = detalleVentasId;
     }
 
     public String getNombreCliente() {
