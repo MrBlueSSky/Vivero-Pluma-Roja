@@ -2,7 +2,12 @@ package main;
 
 import Clases.DBconection;
 import Clases.Factura;
+import Clases.Producto;
 import Clases.Vendedor;
+import java.awt.Color;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -10,6 +15,10 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,6 +38,11 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 /**
  * Controller for the bills window. Manages the user interface logic for bill
@@ -47,12 +61,11 @@ public class BillController implements Initializable {
     @FXML
     private TableColumn<Factura, String> state;
     @FXML
-    private TableColumn<Factura, String> currency; // Displays the name of the currency
+    private TableColumn<Factura, String> currency;
     @FXML
     private TableView<Factura> tableBills;
     @FXML
     private Button delete;
-    @FXML
     private Button createBill;
     @FXML
     private TextField search;
@@ -62,6 +75,12 @@ public class BillController implements Initializable {
     private Button createBill1;
     @FXML
     private TableColumn<Factura, String> customerName;
+    @FXML
+    private Button generateSaleReportButton;
+    @FXML
+    private TableColumn<Factura, Integer> detalleVentasIdColumn;
+    @FXML
+    private Button updateState;
 
     /**
      * Initializes the controller. Loads bills and sets up table columns.
@@ -92,7 +111,7 @@ public class BillController implements Initializable {
         state.setCellValueFactory(new PropertyValueFactory<>("estado"));
         currency.setCellValueFactory(new PropertyValueFactory<>("moneda"));
         customerName.setCellValueFactory(new PropertyValueFactory<>("nombreCliente"));
-
+        detalleVentasIdColumn.setCellValueFactory(new PropertyValueFactory<>("detalleVentasId"));
     }
 
     /**
@@ -105,12 +124,13 @@ public class BillController implements Initializable {
 
         try {
             conn = new DBconection().establishConnection();
-            // Updated query to include the customer's name
-            String query = "SELECT f.*, m.nombre AS monedaNombre, c.nombre AS nombreCliente "
+            String query = "SELECT f.*, m.nombre AS monedaNombre, c.nombre AS nombreCliente, dv.detalleVentasId "
                     + "FROM Facturas f "
                     + "JOIN Moneda m ON f.monedaId = m.monedaId "
                     + "JOIN Ventas v ON f.ventasId = v.ventasId "
-                    + "JOIN Clientes c ON v.clienteId = c.clienteId";
+                    + "JOIN Clientes c ON v.clienteId = c.clienteId "
+                    + "JOIN DetalleVentas dv ON v.ventasId = dv.ventasId"; // Agregar JOIN
+
             pst = conn.prepareStatement(query);
             rs = pst.executeQuery();
 
@@ -122,7 +142,8 @@ public class BillController implements Initializable {
                         rs.getString("estado"),
                         rs.getInt("monedaId"),
                         rs.getString("monedaNombre"),
-                        rs.getString("nombreCliente")
+                        rs.getString("nombreCliente"),
+                        rs.getInt("detalleVentasId") // Asignar detalleVentasId
                 );
                 facturaList.add(factura);
             }
@@ -302,5 +323,54 @@ public class BillController implements Initializable {
         }
     }
 
+    @FXML
+    private void onGenerateReportButtonClick(ActionEvent event) throws IOException {
+        Factura selectedFactura = tableBills.getSelectionModel().getSelectedItem();
+        if (selectedFactura != null) {
+            generateInvoicePDF(selectedFactura);
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("PDF Generado");
+            alert.setHeaderText(null);
+            alert.setContentText("El PDF de la factura ha sido generado exitosamente.");
+            alert.showAndWait();
+        } else {
+            Alert alert = new Alert(AlertType.WARNING);
+            alert.setTitle("Selección de Factura");
+            alert.setHeaderText(null);
+            alert.setContentText("Por favor, selecciona una factura para generar el PDF.");
+            alert.showAndWait();
+        }
+    }
 
+    /**
+     * Handles the action of updating the state of the invoice. This method
+     * loads the UpdateState.fxml file to display the update interface for the
+     * invoice state. It also closes the current window after opening the new
+     * window.
+     *
+     * @param event the action event triggered by the user (e.g., button click)
+     */
+    @FXML
+    private void updateState(ActionEvent event) {
+        try {
+            // Load the new window
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("UpdateState.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Actualizar estado de factura");
+            stage.show();
+
+            // Close the current window
+            Stage currentStage = (Stage) updateState.getScene().getWindow();
+            currentStage.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void generateInvoicePDF(Factura factura) throws IOException {
+
+    }
 }
