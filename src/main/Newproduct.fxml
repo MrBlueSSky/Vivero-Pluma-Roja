@@ -1,30 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="591.0" prefWidth="766.0" style="-fx-background-color: #FFFACD;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.NewproductController">
+<AnchorPane id="AnchorPane" prefHeight="591.0" prefWidth="766.0" style="-fx-background-color: #E0EFF1;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.NewproductController">
    <children>
-      <TextField fx:id="desciption" layoutX="291.0" layoutY="92.0" promptText="Descripción" />
-      <TextField fx:id="price" layoutX="291.0" layoutY="215.0" promptText="Precio" />
-      <TextField fx:id="stock" layoutX="291.0" layoutY="279.0" promptText="Cantidad" />
-      <ComboBox fx:id="category" layoutX="291.0" layoutY="347.0" prefWidth="150.0" promptText="Categoria" />
-      <ComboBox fx:id="discount" layoutX="291.0" layoutY="408.0" prefWidth="150.0" promptText="Descuento" />
-      <Button fx:id="newProduct" layoutX="156.0" layoutY="478.0" mnemonicParsing="false" onAction="#newProduct" prefHeight="49.0" prefWidth="165.0" style="-fx-background-color: #B3FFCC;" text="Agregar nuevo producto">
+      <TextField fx:id="desciption" layoutX="291.0" layoutY="92.0" promptText="Descripción">
+         <cursor>
+            <Cursor fx:constant="TEXT" />
+         </cursor>
+         <effect>
+            <DropShadow />
+         </effect></TextField>
+      <TextField fx:id="price" layoutX="291.0" layoutY="215.0" promptText="Precio">
+         <cursor>
+            <Cursor fx:constant="TEXT" />
+         </cursor>
+         <effect>
+            <DropShadow />
+         </effect></TextField>
+      <TextField fx:id="stock" layoutX="291.0" layoutY="279.0" promptText="Cantidad">
+         <cursor>
+            <Cursor fx:constant="TEXT" />
+         </cursor>
+         <effect>
+            <DropShadow />
+         </effect></TextField>
+      <ComboBox fx:id="category" layoutX="291.0" layoutY="347.0" prefWidth="150.0" promptText="Categoria">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></ComboBox>
+      <ComboBox fx:id="discount" layoutX="291.0" layoutY="408.0" prefWidth="150.0" promptText="Descuento">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></ComboBox>
+      <Button fx:id="newProduct" layoutX="156.0" layoutY="478.0" mnemonicParsing="false" onAction="#newProduct" prefHeight="49.0" prefWidth="165.0" style="-fx-background-color: #7DB4B5;" text="Agregar nuevo producto">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Button>
-      <Button fx:id="cancel" layoutX="476.0" layoutY="481.0" mnemonicParsing="false" onAction="#cancel" prefHeight="43.0" prefWidth="176.0" style="-fx-background-color: #B3FFCC;" text="Cancelar">
+      <Button fx:id="cancel" layoutX="476.0" layoutY="481.0" mnemonicParsing="false" onAction="#cancel" prefHeight="43.0" prefWidth="176.0" style="-fx-background-color: #7DB4B5;" text="Cancelar">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Button>
-      <ComboBox fx:id="state" layoutX="291.0" layoutY="155.0" prefWidth="150.0" promptText="Estado" />
+      <ComboBox fx:id="state" layoutX="291.0" layoutY="155.0" prefWidth="150.0" promptText="Estado">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></ComboBox>
       <Label layoutX="73.0" layoutY="92.0" prefHeight="25.0" prefWidth="139.0" text="Descripción:">
          <font>
             <Font name="System Bold" size="12.0" />
@@ -56,4 +91,7 @@
          </font>
       </Label>
    </children>
+   <cursor>
+      <Cursor fx:constant="DEFAULT" />
+   </cursor>
 </AnchorPane>

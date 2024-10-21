@@ -5,12 +5,13 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="453.0" prefWidth="897.0" style="-fx-background-color: #FFFACD;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.BillController">
+<AnchorPane id="AnchorPane" prefHeight="453.0" prefWidth="897.0" style="-fx-background-color: #E0EFF1;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.BillController">
    <children>
-      <Button fx:id="inventory" layoutX="723.0" layoutY="328.0" mnemonicParsing="false" onAction="#returnInventory" prefHeight="42.0" prefWidth="148.0" style="-fx-background-color: #B3FFCC;" text="Inventario">
+      <Button fx:id="inventory" layoutX="723.0" layoutY="328.0" mnemonicParsing="false" onAction="#returnInventory" prefHeight="42.0" prefWidth="148.0" style="-fx-background-color: #7DB4B5;" text="Inventario">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -30,34 +31,37 @@
       </TableView>
       <TextField fx:id="search" layoutX="96.0" layoutY="31.0" prefHeight="42.0" prefWidth="374.0" promptText="Buscar">
          <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor></TextField>
-      <TextField layoutX="25.0" layoutY="39.0" prefHeight="26.0" prefWidth="56.0" style="-fx-background-color: #FFFACD;" text="Buscar:">
+            <Cursor fx:constant="TEXT" />
+         </cursor>
+         <effect>
+            <DropShadow />
+         </effect></TextField>
+      <TextField layoutX="25.0" layoutY="39.0" prefHeight="26.0" prefWidth="56.0" style="-fx-background-color: #E0EFF1;" text="Buscar:">
          <font>
             <Font name="System Bold" size="12.0" />
          </font></TextField>
-      <Button fx:id="delete" layoutX="723.0" layoutY="245.0" mnemonicParsing="false" onAction="#deleteBill" prefHeight="42.0" prefWidth="148.0" style="-fx-background-color: #B3FFCC;" text="Eliminar">
+      <Button fx:id="delete" layoutX="723.0" layoutY="245.0" mnemonicParsing="false" onAction="#deleteBill" prefHeight="42.0" prefWidth="148.0" style="-fx-background-color: #7DB4B5;" text="Eliminar">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <Button fx:id="updateState" layoutX="723.0" layoutY="177.0" mnemonicParsing="false" onAction="#updateState" prefHeight="42.0" prefWidth="148.0" style="-fx-background-color: #B3FFCC;" text="Actulizar estado">
+      <Button fx:id="updateState" layoutX="723.0" layoutY="177.0" mnemonicParsing="false" onAction="#updateState" prefHeight="42.0" prefWidth="148.0" style="-fx-background-color: #7DB4B5;" text="Actulizar estado">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <Button fx:id="createBill1" layoutX="723.0" layoutY="105.0" mnemonicParsing="false" onAction="#generateBill" prefHeight="42.0" prefWidth="148.0" style="-fx-background-color: #B3FFCC;" text="Facturar">
+      <Button fx:id="createBill1" layoutX="723.0" layoutY="105.0" mnemonicParsing="false" onAction="#generateBill" prefHeight="42.0" prefWidth="148.0" style="-fx-background-color: #7DB4B5;" text="Facturar">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <Button fx:id="generateSaleReportButton" layoutX="495.0" layoutY="27.0" mnemonicParsing="false" onAction="#onGenerateReportButtonClick" prefHeight="42.0" prefWidth="170.0" style="-fx-background-color: #B3FFCC;" text="Generar detalle de venta">
+      <Button fx:id="generateSaleReportButton" layoutX="495.0" layoutY="27.0" mnemonicParsing="false" onAction="#onGenerateReportButtonClick" prefHeight="42.0" prefWidth="170.0" style="-fx-background-color: #7DB4B5;" text="Generar detalle de venta">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>

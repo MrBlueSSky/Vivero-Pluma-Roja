@@ -6,22 +6,28 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="662.0" prefWidth="1079.0" style="-fx-background-color: #FFFACD;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.InventoryController">
+<AnchorPane id="AnchorPane" prefHeight="658.0" prefWidth="987.0" style="-fx-background-color: #E0EFF1;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.InventoryController">
    <children>
-      <TableView fx:id="tableInventory" layoutX="23.0" layoutY="126.0" prefHeight="366.0" prefWidth="691.0">
+      <TableView fx:id="tableInventory" layoutX="23.0" layoutY="126.0" prefHeight="366.0" prefWidth="706.0" style="-fx-background-color: FAFAFA;">
         <columns>
           <TableColumn fx:id="id" prefWidth="64.0" text="Id" />
           <TableColumn fx:id="Descripcion" prefWidth="347.0" text="Descripcion" />
             <TableColumn fx:id="estado" prefWidth="89.0" text="Estado" />
-            <TableColumn fx:id="precio" prefWidth="64.0" text="Precio" />
-            <TableColumn fx:id="stock" prefWidth="55.0" text="Stock" />
+            <TableColumn fx:id="precio" prefWidth="83.0" text="Precio" />
+            <TableColumn fx:id="stock" prefWidth="52.0" text="Stock" />
             <TableColumn fx:id="descuento" prefWidth="70.0" text="Descuento" />
         </columns>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </TableView>
-      <Button fx:id="nuevoProdcto" layoutX="23.0" layoutY="553.0" mnemonicParsing="false" onAction="#newProduct" prefHeight="48.0" prefWidth="246.0" style="-fx-background-color: #B3FFCC;" text="Agregar un nuevo producto">
+      <Button fx:id="nuevoProdcto" layoutX="23.0" layoutY="553.0" mnemonicParsing="false" onAction="#newProduct" prefHeight="48.0" prefWidth="246.0" style="-fx-background-color: #7DB4B5;" text="Agregar un nuevo producto">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -29,7 +35,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="facturas" layoutX="588.0" layoutY="553.0" mnemonicParsing="false" onAction="#billMethod" prefHeight="48.0" prefWidth="211.0" style="-fx-background-color: #B3FFCC;" text="Facturas">
+      <Button fx:id="facturas" layoutX="588.0" layoutY="553.0" mnemonicParsing="false" onAction="#billMethod" prefHeight="48.0" prefWidth="211.0" style="-fx-background-color: #7DB4B5;" text="Facturas">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -37,8 +43,14 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <TextField fx:id="searchField" layoutX="186.0" layoutY="48.0" prefHeight="40.0" prefWidth="413.0" promptText="Buscar" style="-fx-background-color: #FFFFFF;" />
-      <Button fx:id="updateProduct" layoutX="307.0" layoutY="553.0" mnemonicParsing="false" onAction="#updateProduct" prefHeight="48.0" prefWidth="246.0" style="-fx-background-color: #B3FFCC;" text="Actualizar producto">
+      <TextField fx:id="searchField" layoutX="186.0" layoutY="48.0" prefHeight="40.0" prefWidth="413.0" promptText="Buscar" style="-fx-background-color: FAFAFA;">
+         <cursor>
+            <Cursor fx:constant="TEXT" />
+         </cursor>
+         <effect>
+            <DropShadow />
+         </effect></TextField>
+      <Button fx:id="updateProduct" layoutX="307.0" layoutY="553.0" mnemonicParsing="false" onAction="#updateProduct" prefHeight="48.0" prefWidth="246.0" style="-fx-background-color: #7DB4B5;" text="Actualizar producto">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -46,7 +58,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="delete" layoutX="833.0" layoutY="553.0" mnemonicParsing="false" onAction="#deleteProduct" prefHeight="48.0" prefWidth="211.0" style="-fx-background-color: #B3FFCC;" text="Eliminar">
+      <Button fx:id="delete" layoutX="833.0" layoutY="553.0" mnemonicParsing="false" onAction="#deleteProduct" prefHeight="48.0" prefWidth="211.0" style="-fx-background-color: #7DB4B5;" text="Eliminar">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -54,7 +66,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="newClient" layoutX="789.0" layoutY="307.0" mnemonicParsing="false" onAction="#newClient" prefHeight="48.0" prefWidth="211.0" style="-fx-background-color: #B3FFCC;" text="Agregar nuevo cliente">
+      <Button fx:id="newClient" layoutX="789.0" layoutY="307.0" mnemonicParsing="false" onAction="#newClient" prefHeight="48.0" prefWidth="211.0" style="-fx-background-color: #7DB4B5;" text="Agregar nuevo cliente">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -62,7 +74,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="newSeller" layoutX="789.0" layoutY="198.0" mnemonicParsing="false" onAction="#newSeller" prefHeight="48.0" prefWidth="211.0" style="-fx-background-color: #B3FFCC;" text="Agregar nuevo vendedor">
+      <Button fx:id="newSeller" layoutX="789.0" layoutY="198.0" mnemonicParsing="false" onAction="#newSeller" prefHeight="48.0" prefWidth="211.0" style="-fx-background-color: #7DB4B5;" text="Agregar nuevo vendedor">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -70,7 +82,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button fx:id="buttonReport" layoutX="784.0" layoutY="413.0" mnemonicParsing="false" onAction="#generateReport" prefHeight="48.0" prefWidth="222.0" style="-fx-background-color: #B3FFCC;" text="Crear reporte de inventario">
+      <Button fx:id="buttonReport" layoutX="784.0" layoutY="413.0" mnemonicParsing="false" onAction="#generateReport" prefHeight="48.0" prefWidth="222.0" style="-fx-background-color: #7DB4B5;" text="Crear reporte de inventario">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -86,5 +98,10 @@
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
+      <ImageView fitHeight="150.0" fitWidth="170.0" layoutX="820.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../Image/logo.jpeg" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>

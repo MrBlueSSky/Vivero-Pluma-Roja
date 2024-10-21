@@ -5,12 +5,7 @@
 package main;
 
 import Clases.DBconection;
-import Clases.Factura;
 import Clases.Producto;
-import java.awt.Color;
-import java.awt.Desktop;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -21,13 +16,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -48,11 +38,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 /**
  * FXML Controller class responsible for generating bills. This class handles
@@ -513,10 +498,10 @@ public class GenerateBillController implements Initializable {
      * Loads the ENUM values for the "estado" field from the database and
      * populates the ComboBox.
      * <p>
-     * This method connects to the MySQL database using the `DBconection` class
+     * This method connects to the MySQL database using the DBconection class
      * and retrieves the ENUM values defined in the "estado" column of the
      * "Facturas" table. The values are parsed, extracted, and added to the
-     * ComboBox named `state`.
+     * ComboBox named state.
      * </p>
      */
     private void cargarEstadosDesdeBaseDeDatos() {
@@ -547,7 +532,7 @@ public class GenerateBillController implements Initializable {
                     // Split the values into an array, remove quotes, and add each to the ObservableList
                     String[] valuesArray = enumValues.replace("'", "").split(",");
 
-                    // Loop through the array and add each value to the `estados` list
+                    // Loop through the array and add each value to the estados list
                     for (String value : valuesArray) {
                         estados.add(value);
                     }
@@ -579,19 +564,19 @@ public class GenerateBillController implements Initializable {
      * <p>
      * This method establishes a connection to the MySQL database using the
      * {@link DBconection} class, retrieves the currency names defined in the
-     * "Moneda" table, and adds these values to the ComboBox named `currency`.
+     * "Moneda" table, and adds these values to the ComboBox named currency.
      * </p>
      *
      * <p>
      * The process involves executing a simple SQL SELECT query to obtain the
-     * `nombre` values, storing them in an {@link ObservableList}, and then
+     * nombre values, storing them in an {@link ObservableList}, and then
      * setting this list as the items for the ComboBox. In case of a database
      * error, it catches and prints the exception stack trace.
      * </p>
      *
      * <pre>
      * Example usage:
-     * // Assuming this is called inside a Controller class with the ComboBox `currency`
+     * // Assuming this is called inside a Controller class with the ComboBox currency
      * cargarMonedasDesdeBaseDeDatos();
      * </pre>
      *
@@ -725,11 +710,12 @@ public class GenerateBillController implements Initializable {
                                             detalleStatement.executeUpdate();
 
                                             // Disminuir el stock para el producto
-                                            updateProductStock(producto.getProductoId(), producto.getStock(), connection); // Implement this method
+                                            updateProductStock(producto.getProductoId(), producto.getStock(), connection);
                                         }
                                     }
                                     connection.commit(); // Commit transaction
                                     showAlert("Éxito", "Factura generada correctamente.");
+                                    returnBill();
                                 } else {
                                     showAlert("Error", "No se pudo generar la factura. Por favor, intente de nuevo.");
                                 }
@@ -1020,6 +1006,7 @@ public class GenerateBillController implements Initializable {
                                         }
                                         connection.commit(); 
                                         showAlert("Éxito", "Factura generada correctamente.");
+                                        returnBill();
                                     }
                                 } else {
                                     showAlert("Error", "No se pudo generar la factura. Por favor, intente de nuevo.");
@@ -1174,9 +1161,11 @@ public class GenerateBillController implements Initializable {
                 // Mensaje de éxito
                 Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
                 successAlert.setTitle("Eliminación exitosa");
+                updateInvoiceTotals();
                 successAlert.setHeaderText(null);
                 successAlert.setContentText("Producto eliminado exitosamente de la tabla.");
                 successAlert.showAndWait();
+                updateInvoiceTotals();
             }
         } else {
             // Mostrar mensaje si no hay producto seleccionado
@@ -1185,6 +1174,30 @@ public class GenerateBillController implements Initializable {
             alert.setHeaderText("No hay producto seleccionado");
             alert.setContentText("Seleccione un producto para eliminar.");
             alert.showAndWait();
+        }
+    }
+    
+        /**
+     * Returns to the inventory window, closing the current window.
+     *
+     * @param event The action event that triggers the return.
+     */
+    
+    private void returnBill() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Bill.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Facturas");
+            stage.show();
+
+            // Close the current window
+            Stage currentStage = (Stage) billButton.getScene().getWindow();
+            currentStage.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

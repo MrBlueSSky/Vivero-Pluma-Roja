@@ -28,8 +28,6 @@ public class Vivero extends Application {
      *
      * @param stage The primary stage for this application, onto which the scene
      * will be set.
-     * @throws Exception If there is an issue loading the FXML file or setting
-     * up the scene.
      */
     @Override
     public void start(Stage stage) {
