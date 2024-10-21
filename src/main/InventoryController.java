@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package main;
 
 import Clases.DBconection;
@@ -10,9 +6,11 @@ import java.awt.Color;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -114,8 +112,7 @@ public class InventoryController implements Initializable {
         cargarDatosDesdeDB();
         tableInventory.setItems(productosList);
 
-        // Configurar la columna de precio con formato
-        precio.setCellValueFactory(new PropertyValueFactory<>("precio"));
+        // Configurar la columna de precio para mostrar con formato de moneda y dos decimales
         precio.setCellFactory(column -> new TableCell<Producto, Double>() {
             @Override
             protected void updateItem(Double item, boolean empty) {
@@ -123,35 +120,49 @@ public class InventoryController implements Initializable {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText(String.format("%.2f", item));
+                    setText(String.format("$%.2f", item)); // Mostrar con símbolo de moneda y dos decimales
                 }
-            }
-        });
 
-        // Configurar la columna de descuento para mostrar el porcentaje
-        descuento.setCellFactory(column -> new TableCell<Producto, Integer>() {
-            @Override
-            protected void updateItem(Integer item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    // Obtener el porcentaje de descuento de la lista
-                    Producto producto = getTableView().getItems().get(getIndex());
-                    if (producto.getDescuentoId() > 0) {
-                        // Lógica para obtener el porcentaje según el ID (esto puede requerir otro método o lógica)
-                        setText(item + "%");  // Mostrar el porcentaje de descuento
-                    } else {
-                        setText("Sin descuento");
+                // Configurar la columna de precio con formato
+                precio.setCellValueFactory(new PropertyValueFactory<>("precio"));
+                precio.setCellFactory(column -> new TableCell<Producto, Double>() {
+
+                    protected void updateItem(Double item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(String.format("%.2f", item));
+                        }
+                    }
+                });
+
+                // Configurar la columna de descuento para mostrar correctamente el porcentaje
+                descuento.setCellFactory(column
+                        -> new TableCell<Producto, Integer>() {
+                    @Override
+                    protected void updateItem(Integer item, boolean empty
+                    ) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else if (item == 0) {
+                            setText("Sin descuento");
+                        } else {
+                            setText(item + "%");  // Mostrar el porcentaje de descuento
+                        }
                     }
                 }
+                );
             }
         });
 
-        // Añadir el listener al TextField para la búsqueda en tiempo real
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filtrarProductos(newValue);
-        });
+        searchField
+                .textProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    filtrarProductos(newValue);
+                }
+                );
     }
 
     /**
@@ -168,7 +179,10 @@ public class InventoryController implements Initializable {
         try {
             // Establecer conexión a la base de datos
             conn = new DBconection().establishConnection();
-            String query = "SELECT p.*, d.porcentaje AS descuentoPorcentaje FROM Productos p "
+
+            String query = "SELECT p.productoId, p.descripcion, p.estado, p.precio, p.stock, "
+                    + "IFNULL(d.porcentaje, 0) AS descuento "
+                    + "FROM Productos p "
                     + "LEFT JOIN Descuentos d ON p.descuentoId = d.descuentoId";
 
             // Crear una declaración y ejecutar la consulta
@@ -178,32 +192,35 @@ public class InventoryController implements Initializable {
             // Limpiar la lista observable antes de agregar nuevos datos
             productosList.clear();
 
-            // Procesar los resultados
+            // Procesar los resultados de la consulta
             while (rs.next()) {
                 int productoId = rs.getInt("productoId");
                 String descripcion = rs.getString("descripcion");
                 String estado = rs.getString("estado");
                 double precio = rs.getDouble("precio");
                 int stock = rs.getInt("stock");
-                int descuentoId = rs.getInt("descuentoId");
-                int descuentoPorcentaje = rs.getInt("descuentoPorcentaje"); // Obtener el porcentaje de descuento
+                int descuento = rs.getInt("descuento");  // Aquí ya tenemos el porcentaje en lugar del descuentoId
+
+                // Crear un nuevo objeto Producto con el porcentaje de descuento
+                Producto producto = new Producto(productoId, descripcion, estado, precio, stock, descuento);
 
                 // Validar los datos recuperados
                 if (descripcion != null && !descripcion.trim().isEmpty()
                         && estado != null && !estado.trim().isEmpty()
                         && precio >= 0 && stock >= 0) {
 
-                    // Agregar a la lista observable, pero usaremos solo descuentoId
-                    productosList.add(new Producto(productoId, descripcion, estado, precio, stock, descuentoId));
+                    // Agregar a la lista observable
+                    productosList.add(producto);
                 } else {
                     System.err.println("Error: Datos inválidos para el producto ID: " + productoId);
                 }
             }
+
         } catch (SQLException e) {
             System.err.println("Error al recuperar datos desde la base de datos: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            // Cerrar recursos en el bloque finally
+            // Cerrar los recursos de la base de datos en el bloque finally
             try {
                 if (rs != null) {
                     rs.close();
@@ -302,6 +319,7 @@ public class InventoryController implements Initializable {
             mainStage.show();
 
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -316,7 +334,7 @@ public class InventoryController implements Initializable {
 
             // Obtener la ventana actual
             Stage stage = (Stage) tableInventory.getScene().getWindow();
-            stage.close();  // Cerrar la ventana de inventario
+            stage.close();  // Cerrar la ventana de login
 
             // Crear una nueva ventana para la próxima vista
             Stage mainStage = new Stage();
@@ -325,6 +343,7 @@ public class InventoryController implements Initializable {
             mainStage.show();
 
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -542,7 +561,8 @@ public class InventoryController implements Initializable {
             contentStream = new PDPageContentStream(document, page);
 
             // Add logo
-            File logoFile = new File("C:\\Users\\fabri\\Documents\\NetBeansProjects\\Vivero\\src\\Image\\logo.jpeg");
+            File logoFile = new File("C:\\Users\\fabri\\OneDrive\\Escritorio"
+                    + "\\vivero final\\Vivero-Pluma-Roja\\src\\Image\\logo.jpeg");
             if (!logoFile.exists()) {
                 throw new FileNotFoundException("Logo file not found at: " + logoFile.getPath());
             }
